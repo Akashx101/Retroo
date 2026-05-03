@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="/style.css">
+    
+    <style>
+        #preloader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #000000; z-index: 99999; display: flex; justify-content: center; align-items: center; transition: opacity 0.8s ease-out, visibility 0.8s ease-out; }
+        .loader-text { color: #ffffff; font-family: 'Syncopate', sans-serif, Arial; font-size: 20px; letter-spacing: 12px; text-transform: uppercase; font-weight: 700; animation: pulse 1s infinite alternate; margin-left: 12px; }
+        @keyframes pulse { 0% { opacity: 0.2; filter: blur(2px); } 100% { opacity: 1; filter: blur(0); } }
+        body.loaded #preloader { opacity: 0; visibility: hidden; }
+        
+        .announcement { position: relative; z-index: 1001; padding: 4px 0 !important; font-size: 7px !important; }
+        
+        /* 1 & 3: TRANSPARENT NAVBAR TO SOLID ON SCROLL */
+        .navbar { position: fixed; top: 22px; left: 0; width: 100%; z-index: 1000; background-color: transparent; padding: 15px 30px !important; border-bottom: none; transition: all 0.3s ease; box-sizing: border-box; }
+        .navbar.scrolled { top: 0; background-color: rgba(0,0,0,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #1a1a1a; padding: 12px 30px !important; }
+        .nav-right { display: flex; gap: 20px; align-items: center; }
+        .nav-right a { font-size: 24px !important; cursor: pointer; } 
+
+        /* HERO FIX: Merging behind transparent nav & making text smaller */
+        .hero { margin-top: -22px; } /* Pulls image up behind the transparent nav */
+        .hero-content h1 { font-size: 22px !important; letter-spacing: 4px !important; line-height: 1.4; margin-bottom: 10px; }
+        .hero-content p { font-size: 9px !important; letter-spacing: 2px !important; }
+
+        /* 1: SIDE DRAWER MENU STYLES */
+        .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1999; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .drawer-overlay.active { opacity: 1; pointer-events: all; }
+        .drawer { position: fixed; top: 0; right: -100%; width: 250px; height: 100vh; background: #050505; border-left: 1px solid #1a1a1a; z-index: 2000; transition: right 0.4s cubic-bezier(0.77, 0, 0.175, 1); display: flex; flex-direction: column; padding: 40px 20px; box-sizing: border-box; }
+        .drawer.active { right: 0; }
+        .close-drawer { position: absolute; top: 20px; right: 20px; font-size: 28px; cursor: pointer; color: #fff; }
+        .drawer-links { margin-top: 50px; display: flex; flex-direction: column; }
+        .drawer-links a { display: flex; align-items: center; gap: 15px; color: #fff; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; padding: 20px 0; border-bottom: 1px solid #1a1a1a; text-decoration: none; }
+        .drawer-links i { font-size: 22px; color: #888; }
+
+        /* 2: FULL SCREEN SEARCH OVERLAY */
+        .search-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.98); z-index: 2500; opacity: 0; pointer-events: none; transition: 0.3s; display: flex; flex-direction: column; padding: 40px 20px; box-sizing: border-box; }
+        .search-overlay.active { opacity: 1; pointer-events: all; }
+        .search-close { position: absolute; top: 20px; right: 20px; font-size: 32px; cursor: pointer; color: #fff; }
+        .search-input-wrapper { display: flex; align-items: center; border-bottom: 1px solid #333; margin-top: 60px; padding-bottom: 10px; }
+        .search-input-wrapper input { flex: 1; background: transparent; border: none; color: #fff; font-family: 'Inter', sans-serif; font-size: 12px; outline: none; text-transform: uppercase; letter-spacing: 2px; }
+        .search-input-wrapper i { font-size: 24px; color: #666; margin-right: 15px; }
+        .search-dropdown { margin-top: 20px; overflow-y: auto; max-height: 60vh; }
+        .search-result-item { display: flex; align-items: center; gap: 15px; padding: 15px 0; border-bottom: 1px solid #1a1a1a; cursor: pointer; }
+        .search-result-item img { width: 50px; height: 60px; object-fit: cover; }
+        .search-result-info h4 { font-family: 'Syncopate', sans-serif; font-size: 9px; letter-spacing: 1px; margin-bottom: 4px; text-transform: uppercase; }
+        .search-result-info span { font-size: 10px; color: #888; }
+
+        .yt-carousel { position: relative; max-width: 800px; margin: 0 auto; aspect-ratio: 16/9; overflow: hidden; border: 1px solid var(--border); }
+        .yt-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.8s ease; background-size: cover; background-position: center; }
+        .yt-slide.active { opacity: 1; }
+
+        .faq-section { padding: 60px 20px; max-width: 800px; margin: 0 auto; border-top: 1px solid var(--border); }
+        .faq-title { text-align: center; font-family: 'Syncopate', sans-serif; font-size: 14px; letter-spacing: 4px; margin-bottom: 40px; text-transform: uppercase; }
+        .faq-item { border-bottom: 1px solid var(--border); padding: 20px 0; }
+        .faq-item summary { display: flex; justify-content: space-between; align-items: center; font-size: 10px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; list-style: none; outline: none; }
+        .faq-item summary::-webkit-details-marker { display: none; } 
+        .faq-item p { margin-top: 15px; font-size: 11px; color: #888; line-height: 1.8; text-transform: uppercase; letter-spacing: 1px; }
+        details[open] summary i { transform: rotate(180deg); }
+        summary i { transition: transform 0.3s ease; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <div id="preloader"><div class="loader-text">RETROO</div></div>
+
+    <div class="announcement">
+        <div class="marquee">
+            * MASSIVE DROPS LIVE * ENJOY UP TO 40% DISCOUNT ROLLS * FREE SHIPPING ON ALL ORDERS OVER ₹1500 * LIMITED EDITION MENS ACCESSORIES * ENJOY UP TO 40% DISCOUNT ROLLS *
+        </div>
+    </div>
+    
+    <nav class="navbar" id="main-nav">
+        <div class="logo" style="cursor:pointer;" onclick="window.location.href='/'">RETROO</div>
+        <div class="nav-right">
+            <a onclick="toggleSearch()" aria-label="Search"><i class="ph-thin ph-magnifying-glass"></i></a>
+            <a onclick="toggleDrawer()" aria-label="Menu"><i class="ph-thin ph-list"></i></a>
+        </div>
+    </nav>
+
+    <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer()"></div>
+    
+    <div class="drawer" id="side-drawer">
+        <i class="ph-thin ph-x close-drawer" onclick="toggleDrawer()"></i>
+        <div class="drawer-links">
+            <a href="/cart"><i class="ph-thin ph-shopping-bag"></i> CART</a>
+            <a href="/wishlist"><i class="ph-thin ph-heart"></i> WISHLIST</a>
+            <a href="/orderhistory"><i class="ph-thin ph-user"></i> ACCOUNT</a>
+        </div>
+    </div>
+
+    <div class="search-overlay" id="search-overlay">
+        <i class="ph-thin ph-x search-close" onclick="toggleSearch()"></i>
+        <div class="search-input-wrapper">
+            <i class="ph-thin ph-magnifying-glass"></i>
+            <input type="text" id="searchInput" placeholder="SEARCH COLLECTION..." onkeyup="handleLiveSearch(this.value)" />
+        </div>
+        <div id="searchResults" class="search-dropdown"></div>
+    </div>
+
+    <header class="hero" id="hero-carousel">
+        <div class="hero-slide active" style="background: url('https://i.ibb.co/8nvX2W5h/a343c177-c630-4f0f-a1f0-b6040f6450fa.jpg') center/cover no-repeat;"></div>
+        <div class="hero-slide" style="background: url('https://i.ibb.co/JjYJhHKh/2fef5a99-a0e3-490a-a0ef-a66af77d63de.jpg') center/cover no-repeat;"></div>
+       <div class="hero-overlay"></div> 
+        <div class="hero-content">
+            <h1>STYLE<br>VIBE<br>REFLECT</h1>
+            <p>The New Standard of Men's Luxury</p>
+            <button class="btn" onclick="window.location.href='/newdrops'">VISIT NEW DROPS</button>
+        </div>
+    </header>
+
+    <section class="section-title">
+        <h2>Designed to Disrupt</h2>
+        <p>Luxury staples for the modern disruptor. Precision-tailored pieces that break convention and redefine presence.</p>
+    </section>
+
+    <div class="product-grid" id="home-product-grid"></div>
+
+    <section style="padding: 40px 20px 60px;">
+        <h2 style="text-align: center; font-family: 'Syncopate', sans-serif; font-size: 14px; letter-spacing: 4px; margin-bottom: 20px; text-transform: uppercase;">Latest Updates</h2>
+        
+        <div class="yt-carousel">
+            <div class="yt-slide active" style="background-image: url('https://images.unsplash.com/photo-1511556532299-8f662fc26c06?q=80&w=1600&auto=format&fit=crop&grayscale');"></div>
+            <div class="yt-slide" style="background-image: url('https://images.unsplash.com/photo-1492707892479-7bc8d5a4ee93?q=80&w=1600&auto=format&fit=crop&grayscale');"></div>
+            <div class="yt-slide" style="background-image: url('https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=1600&auto=format&fit=crop&grayscale');"></div>
+            <div class="yt-slide" style="background-image: url('https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=1600&auto=format&fit=crop&grayscale');"></div>
+            <div class="yt-slide" style="background-image: url('https://images.unsplash.com/photo-1599643478514-4a4e51111611?q=80&w=1600&auto=format&fit=crop&grayscale');"></div>
+        </div>
+    </section>
+
+    <section class="split-section">
+        <div class="split-text">
+          <h2>Why us? </h2>
+            <p>We envision a world where luxury isn't defined by price tags, but by unyielding quality and aesthetic dominance.</p>
+          </div>
+    </section>
+
+    <section class="faq-section">
+        <h2 class="faq-title">FAQ</h2>
+        
+        <details class="faq-item">
+            <summary>HOW LONG DOES SHIPPING TAKE? <i class="ph-thin ph-caret-down"></i></summary>
+            <p>Orders are processed within 24-48 hours. Standard domestic delivery takes 10-12 business days depending on the destination protocol.</p>
+        </details>
+
+        <details class="faq-item">
+            <summary>How about quality? <i class="ph-thin ph-caret-down"></i></summary>
+            <p>We are pure a store as we do not ship directly as quality is supervised by our partnered platform.</p>
+        </details>
+
+        <details class="faq-item">
+            <summary>WHAT IS THE RETURN POLICY? <i class="ph-thin ph-caret-down"></i></summary>
+            <p>We don't maintain return window but as for convinience , you can contact us on our social handles.</p>
+       </details>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-col about-col">
+                <div class="logo footer-logo">RETROO</div>
+                <p>Founded by Akash G., an 18-year-old visionary, Retroo is forged in darkness and built for the spotlight. We create uncompromised, razor-sharp accessories.</p>
+            </div>
+            <div class="footer-col">
+                <h3>Explore</h3>
+                <a href="/newdrops">New Drops</a>
+                <a href="#">Lookbook</a>
+                <a href="#">Catalog</a>
+            </div>
+            <div class="footer-col">
+                <h3>Support</h3>
+                <a href="#">Shipping & Returns</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact Us</a>
+            </div>
+            <div class="footer-col socials-col">
+                <h3>Connect</h3>
+                <div class="social-icons">
+                    <a href="#"><i class="ph-thin ph-instagram-logo"></i></a>
+                    <a href="#"><i class="ph-thin ph-facebook-logo"></i></a>
+                    <a href="#"><i class="ph-thin ph-whatsapp-logo"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">&copy; 2026 RETROO WORLDWIDE. ALL RIGHTS RESERVED.</div>
+    </footer>
+
+    <script src="/products.js" charset="UTF-8" defer></script>
+    <script>
+        // UI INTERACTIONS
+        function toggleDrawer() {
+            document.getElementById('side-drawer').classList.toggle('active');
+            document.getElementById('drawer-overlay').classList.toggle('active');
+        }
+
+        function toggleSearch() {
+            const overlay = document.getElementById('search-overlay');
+            overlay.classList.toggle('active');
+            if(overlay.classList.contains('active')) {
+                document.getElementById('searchInput').focus();
+            } else {
+                clearSearch();
+            }
+        }
+
+        // SCROLL LISTENER FOR NAVBAR
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('main-nav');
+            if (window.scrollY > 40) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // HERO SLIDER LOGIC
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.hero-slide');
+        function nextSlide() {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
+        setInterval(nextSlide, 4000);
+
+        // YOUTUBE 16:9 SLIDER LOGIC
+        let currentYtSlide = 0;
+        const ytSlides = document.querySelectorAll('.yt-slide');
+        function nextYtSlide() {
+            if(ytSlides.length === 0) return;
+            ytSlides[currentYtSlide].classList.remove('active');
+            currentYtSlide = (currentYtSlide + 1) % ytSlides.length;
+            ytSlides[currentYtSlide].classList.add('active');
+        }
+        setInterval(nextYtSlide, 3500);
+
+        // PRELOADER
+        window.addEventListener('load', function() {
+            setTimeout(() => { document.body.classList.add('loaded'); }, 500);
+        });
+
+        // LIVE SEARCH LOGIC
+        function handleLiveSearch(query) {
+            const dropdown = document.getElementById('searchResults');
+            if (!query.trim()) {
+                dropdown.innerHTML = '';
+                return;
+            }
+            const results = retrooDB.products.filter(p => 
+                p.name.toLowerCase().includes(query.toLowerCase()) || 
+                p.type.toLowerCase().includes(query.toLowerCase())
+            );
+            
+            if (results.length === 0) {
+                dropdown.innerHTML = '<div style="padding: 15px 0; color: #666; font-size: 10px; text-transform: uppercase;">NO HARDWARE FOUND.</div>';
+            } else {
+                dropdown.innerHTML = results.map(p => `
+                    <div class="search-result-item" onclick="window.location.href='/producthome?id=${p.id}'">
+                        <img src="${p.img}" alt="${p.name}">
+                        <div class="search-result-info">
+                            <h4>${p.name}</h4>
+                            <span>${p.newPrice}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchResults').innerHTML = '';
+        }
+    </script>
+</body>
+</html>

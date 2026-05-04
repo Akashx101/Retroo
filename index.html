@@ -8,7 +8,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <link rel="stylesheet" href="/style.css">
+    
+    <link rel="stylesheet" href="style.css">
     
     <style>
         #preloader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #000000; z-index: 99999; display: flex; justify-content: center; align-items: center; transition: opacity 0.8s ease-out, visibility 0.8s ease-out; }
@@ -17,19 +18,15 @@
         body.loaded #preloader { opacity: 0; visibility: hidden; }
         
         .announcement { position: relative; z-index: 1001; padding: 4px 0 !important; font-size: 7px !important; }
-        
-        /* 1 & 3: TRANSPARENT NAVBAR TO SOLID ON SCROLL */
         .navbar { position: fixed; top: 22px; left: 0; width: 100%; z-index: 1000; background-color: transparent; padding: 15px 30px !important; border-bottom: none; transition: all 0.3s ease; box-sizing: border-box; }
         .navbar.scrolled { top: 0; background-color: rgba(0,0,0,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #1a1a1a; padding: 12px 30px !important; }
         .nav-right { display: flex; gap: 20px; align-items: center; }
         .nav-right a { font-size: 24px !important; cursor: pointer; } 
 
-        /* HERO FIX: Merging behind transparent nav & making text smaller */
-        .hero { margin-top: -22px; } /* Pulls image up behind the transparent nav */
+        .hero { margin-top: -22px; } 
         .hero-content h1 { font-size: 22px !important; letter-spacing: 4px !important; line-height: 1.4; margin-bottom: 10px; }
         .hero-content p { font-size: 9px !important; letter-spacing: 2px !important; }
 
-        /* 1: SIDE DRAWER MENU STYLES */
         .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1999; opacity: 0; pointer-events: none; transition: 0.3s; }
         .drawer-overlay.active { opacity: 1; pointer-events: all; }
         .drawer { position: fixed; top: 0; right: -100%; width: 250px; height: 100vh; background: #050505; border-left: 1px solid #1a1a1a; z-index: 2000; transition: right 0.4s cubic-bezier(0.77, 0, 0.175, 1); display: flex; flex-direction: column; padding: 40px 20px; box-sizing: border-box; }
@@ -39,7 +36,6 @@
         .drawer-links a { display: flex; align-items: center; gap: 15px; color: #fff; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; padding: 20px 0; border-bottom: 1px solid #1a1a1a; text-decoration: none; }
         .drawer-links i { font-size: 22px; color: #888; }
 
-        /* 2: FULL SCREEN SEARCH OVERLAY */
         .search-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.98); z-index: 2500; opacity: 0; pointer-events: none; transition: 0.3s; display: flex; flex-direction: column; padding: 40px 20px; box-sizing: border-box; }
         .search-overlay.active { opacity: 1; pointer-events: all; }
         .search-close { position: absolute; top: 20px; right: 20px; font-size: 32px; cursor: pointer; color: #fff; }
@@ -88,9 +84,9 @@
     <div class="drawer" id="side-drawer">
         <i class="ph-thin ph-x close-drawer" onclick="toggleDrawer()"></i>
         <div class="drawer-links">
-            <a href="/cart"><i class="ph-thin ph-shopping-bag"></i> CART</a>
-            <a href="/wishlist"><i class="ph-thin ph-heart"></i> WISHLIST</a>
-            <a href="/orderhistory"><i class="ph-thin ph-user"></i> ACCOUNT</a>
+            <a href="cart/"><i class="ph-thin ph-shopping-bag"></i> CART</a>
+            <a href="wishlist/"><i class="ph-thin ph-heart"></i> WISHLIST</a>
+            <a href="orderhistory/"><i class="ph-thin ph-user"></i> ACCOUNT</a>
         </div>
     </div>
 
@@ -110,7 +106,7 @@
         <div class="hero-content">
             <h1>STYLE<br>VIBE<br>REFLECT</h1>
             <p>The New Standard of Men's Luxury</p>
-            <button class="btn" onclick="window.location.href='/newdrops'">VISIT NEW DROPS</button>
+            <button class="btn" onclick="window.location.href='newdrops/'">VISIT NEW DROPS</button>
         </div>
     </header>
 
@@ -167,7 +163,7 @@
             </div>
             <div class="footer-col">
                 <h3>Explore</h3>
-                <a href="/newdrops">New Drops</a>
+                <a href="newdrops/">New Drops</a>
                 <a href="#">Lookbook</a>
                 <a href="#">Catalog</a>
             </div>
@@ -189,7 +185,7 @@
         <div class="footer-bottom">&copy; 2026 RETROO WORLDWIDE. ALL RIGHTS RESERVED.</div>
     </footer>
 
-    <script src="/products.js" charset="UTF-8" defer></script>
+    <script src="products.js" charset="UTF-8" defer></script>
     <script>
         // UI INTERACTIONS
         function toggleDrawer() {
@@ -258,8 +254,9 @@
             if (results.length === 0) {
                 dropdown.innerHTML = '<div style="padding: 15px 0; color: #666; font-size: 10px; text-transform: uppercase;">NO HARDWARE FOUND.</div>';
             } else {
+                // FIXED FOR GITHUB: Added the folder slash for product home
                 dropdown.innerHTML = results.map(p => `
-                    <div class="search-result-item" onclick="window.location.href='/producthome?id=${p.id}'">
+                    <div class="search-result-item" onclick="window.location.href='producthome/?id=${p.id}'">
                         <img src="${p.img}" alt="${p.name}">
                         <div class="search-result-info">
                             <h4>${p.name}</h4>
